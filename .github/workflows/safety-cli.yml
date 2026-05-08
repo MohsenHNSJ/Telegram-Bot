@@ -1,0 +1,33 @@
+---
+name: Safety-CLI Scanner
+
+# Safety CLI in free tier has a limit of 100 checks per month
+# So we only run in for Pushes and PRs to main
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  safety-cli:
+    name: Run Safety-CLI
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@fa2e9d605c4eeb9fcad4c99c224cee0c6c7f3594 # v2.16.0
+        with:
+          egress-policy: audit # Monitor outbound connections
+
+      - name: Checkout the repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Run Safety CLI to check for vulnerabilities
+        uses: pyupio/safety-action@2591cf2f3e67ba68b923f4c92f0d36e281c65023 # v1.0.1
+        with:
+          api-key: ${{ secrets.SAFETY_CLI_API }}
+          args: --detailed-report # To always see detailed output from this action

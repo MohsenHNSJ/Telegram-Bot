@@ -1,0 +1,30 @@
+# Shellcheck configuration file
+
+# Specify the shell to use
+
+shell=bash
+
+# Default severity for warnings
+
+severity=warning
+
+# Enforce strict variable handling
+
+enable=check-nounset                # Warn when using unset variables (like set -u)
+enable=require-variable-braces      # Enforce braces around all variable references
+enable=warn-unused-vars             # Warn about unused variables
+enable=warn-assign-empty            # Warn when assigning empty strings to variables
+
+# Safety & security
+
+enable=deprecate-which              # Suggest 'command -v' instead of 'which'
+enable=check-exec-path              # Warn about unsafe command usage (eval, user input)
+enable=check-ifs                    # Warn if IFS is changed unsafely
+enable=check-set-e-suppressed       # Notify when set -e is suppressed during function invocation
+
+# Style & best practices
+
+enable=add-default-case             # Suggest adding a default case in `case` statements
+enable=quote-safe-variables         # Suggest quoting variables without meta-characters
+enable=warn-trailing-spaces         # Warn about trailing whitespace
+enable=check-unassigned-uppercase   # Warn when uppercase variables are unassigned

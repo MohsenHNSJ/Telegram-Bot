@@ -1,0 +1,61 @@
+---
+version: 2
+updates:
+  # Github Actions update
+  - package-ecosystem: github-actions
+    directory: "/"
+    labels:
+      - "ci"
+    open-pull-requests-limit: 2000
+    schedule:
+      interval: daily
+
+    # Python dependencies (workflows only)
+  - package-ecosystem: pip
+    directory: "/.github/workflows"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 2000
+    schedule:
+      interval: daily
+    versioning-strategy: increase
+
+    # Python dependencies (documentation only)
+  - package-ecosystem: pip
+    directory: "/docs"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 2000
+    schedule:
+      interval: daily
+    versioning-strategy: increase
+
+    # Python dependencies (all)
+  - package-ecosystem: pip
+    allow:
+      - dependency-type: "all"
+    directory: "/"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 2000
+    schedule:
+      interval: daily
+    versioning-strategy: increase
+
+    # Dockerfile / Container updates
+  - package-ecosystem: docker
+    directory: "/.devcontainer"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 2000
+    schedule:
+      interval: daily
+
+    # Dev container updates
+  - package-ecosystem: devcontainers
+    directory: "/"
+    labels:
+      - "dependencies"
+    open-pull-requests-limit: 2000
+    schedule:
+      interval: daily

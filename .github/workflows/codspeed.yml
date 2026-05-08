@@ -1,0 +1,73 @@
+---
+name: CodSpeed Benchmarks
+
+on:
+  push: # Run on every Push
+  pull_request: # Run on every PR
+  # `workflow_dispatch` allows CodSpeed to trigger back-test
+  # performance analysis in order to generate initial data.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  id-token: write # For OpenID Connect authentication with CodSpeed
+
+jobs:
+  codspeed:
+    name: Run benchmarks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@fa2e9d605c4eeb9fcad4c99c224cee0c6c7f3594 # v2.16.0
+        with:
+          egress-policy: audit # Monitor outbound connections
+
+      - name: Checkout the repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Ensure Poetry cache directory exists
+        run: mkdir -p ~/.cache/pypoetry
+
+      - name: Cache pip
+        id: cache-pip
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml', '**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Print pip cache status
+        run: |
+          echo "pip cache hit: ${{ steps.cache-pip.outputs.cache-hit }}"
+
+      - name: Cache Poetry
+        id: cache-poetry
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
+      - name: Print Poetry cache status
+        run: |
+          echo "poetry cache hit: ${{ steps.cache-poetry.outputs.cache-hit }}"
+
+      - name: Set up the environment
+        uses: ./.github/actions/setup-poetry-env
+        with:
+          install-package: true
+          pytest: true
+          aiohttp: true
+          pytest-asyncio: true
+          pytest-codspeed: true
+
+      - name: Run benchmark
+        uses: CodSpeedHQ/action@1c8ae4843586d3ba879736b7f6b7b0c990757fab # v4.12.1
+        with:
+          mode: "simulation" # Deterministic CPU simulation for stable CI benchmarks
+          run: pytest tests/ --codspeed -rA

@@ -1,0 +1,28 @@
+{
+  "ignore": [
+    "**/node_modules/**",
+    "**/.git/**",
+    "**/.rbenv/**",
+    "**/.venv/**",
+    "**/report/**",
+    "**/megalinter-reports/**",
+    "**/hardis-report/**",
+    "**/*cache*/**",
+    "**/*.json",
+    "**/*.yaml",
+    "**/*.yml",
+    "**/*.md",
+    "**/*.html",
+    "**/*.xml",
+    "**/*.jpg",
+    "**/*.png",
+    "**/*.svg",
+    "**/*.zip",
+    "**/*.bin"
+  ],
+  "reporters": [
+    "html",
+    "markdown"
+  ],
+  "threshold": 0
+}

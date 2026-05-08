@@ -1,0 +1,42 @@
+{
+  "build": {
+    "context": "..",
+    "dockerfile": "Dockerfile"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "almenon.arepl",
+        "charliermarsh.ruff",
+        "codezombiech.gitignore",
+        "davidanson.vscode-markdownlint",
+        "donjayamanne.githistory",
+        "github.copilot-chat",
+        "github.vscode-github-actions",
+        "github.vscode-pull-request-github",
+        "gruntfuggly.todo-tree",
+        "jkiviluoto.tws",
+        "michelemelluso.gitignore",
+        "ms-azuretools.vscode-containers",
+        "ms-python.mypy-type-checker",
+        "ms-python.pylint",
+        "ms-python.python",
+        "njpwerner.autodocstring",
+        "redhat.vscode-yaml",
+        "streetsidesoftware.code-spell-checker",
+        "streetsidesoftware.code-spell-checker-persian",
+        "tamasfe.even-better-toml"
+      ],
+      "settings": {
+        "autoDocstring.docstringFormat": "google",
+        "autopep8.showNotifications": "onError",
+        "editor.formatOnSave": true
+      }
+    }
+  },
+  "features": {
+    "ghcr.io/devcontainers-extra/features/poetry:2": {}
+  },
+  "name": "VaMo TelBot",
+  "postCreateCommand": "bash .devcontainer/post-create.sh"
+}

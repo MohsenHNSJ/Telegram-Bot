@@ -1,0 +1,18 @@
+{
+  "aliveStatusCodes": [
+    200,
+    203,
+    204,
+    301,
+    302,
+    307,
+    308
+  ],
+  "ignorePatterns": [
+    {
+      "pattern": "^MohsenHasanNezhad@outlook.com"
+    }
+  ],
+  "retryCount": 5,
+  "retryOn429": true
+}

@@ -1,0 +1,16 @@
+{
+  "configurations": [
+    {
+      "console": "integratedTerminal",
+      "cwd": "${fileDirname}",
+      "env": {
+        "PYTHONPATH": "${workspaceFolder}/${pathSeparator}${env:PYTHONPATH}"
+      },
+      "justMyCode": true,
+      "name": "Python: Current File",
+      "program": "${file}",
+      "request": "launch",
+      "type": "debugpy"
+    }
+  ]
+}

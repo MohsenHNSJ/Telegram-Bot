@@ -1,0 +1,26 @@
+# ------------------------------------------------------------------
+# Trivy Ignore File
+# Project: hamyar_paygah
+# Purpose: Documented and temporary security rule exceptions
+# NOTE:
+# - All ignores must include a justification.
+# ------------------------------------------------------------------
+
+# ------------------------------------------------------------------
+# AVD-DS-0002
+# Image user should not be 'root'
+# Reason:
+#   Base image requires root for runtime operations.
+#   Container execution is restricted via runtime security controls
+# ------------------------------------------------------------------
+AVD-DS-0002
+
+# ------------------------------------------------------------------
+# AVD-DS-0026
+# No HEALTHCHECK defined in Docker container image
+# Reason:
+#   This image is used exclusively as a VS Code devcontainer
+#   (interactive development environment).
+#   It does not run a long-lived service process.
+# ------------------------------------------------------------------
+AVD-DS-0026

@@ -1,0 +1,40 @@
+---
+# Dependency Review Action
+#
+# This Action will scan dependency manifest files that change as part of a Pull Request,
+# surfacing known-vulnerable versions of the packages declared or updated in the PR.
+# Once installed, if the workflow run is marked as required,
+# PRs introducing known-vulnerable packages will be blocked from merging.
+#
+# Source repository: https://github.com/actions/dependency-review-action
+name: "Dependency Review"
+on: [pull_request]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  dependency-review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@fa2e9d605c4eeb9fcad4c99c224cee0c6c7f3594 # v2.16.0
+        with:
+          egress-policy: audit # Monitor outbound connections
+
+      - name: "Checkout Repository"
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: "Dependency Review"
+        uses: actions/dependency-review-action@2031cfc080254a8a887f58cffee85186f0e49e48 # v4.9.0
+        with:
+          # Enable or disable reporting the review summary as a comment in the pull request.
+          # If enabled, you must give the workflow or job the pull-requests: write permission.
+          # With each execution, a new comment will overwrite the existing one.
+          comment-summary-in-pr: always
+          # Contains a list of packages that will be excluded from license checks.
+          allow-dependencies-licenses: pkg:pyupio/safety-action@2591cf2f3e67ba68b923f4c92f0d36e281c65023 # v1.0.1
+          # Vulnerability summary table will include an additional column showing the first patched version for each vulnerability.
+          # This requires additional API calls to fetch advisory data.
+          show-patched-versions: true

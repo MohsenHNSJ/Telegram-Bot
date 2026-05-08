@@ -1,0 +1,30 @@
+---
+name: Check Links
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+  push: # Run on every Push
+  pull_request: # Run on every PR
+
+permissions: read-all
+
+jobs:
+  link-checker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@fa2e9d605c4eeb9fcad4c99c224cee0c6c7f3594 # v2.16.0
+        with:
+          egress-policy: audit # Monitor outbound connections
+
+      # Git Checkout
+      - name: Checkout the repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Link Checker
+        id: lychee
+        uses: lycheeverse/lychee-action@8646ba30535128ac92d33dfc9133794bfdd9b411 # v2.8.0
+        with:
+          # Fail the action on broken links
+          fail: true
