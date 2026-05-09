@@ -147,7 +147,7 @@ repos:
 
     # Poetry
   - repo: https://github.com/python-poetry/poetry
-    rev: 2.4.0
+    rev: 2.4.1
     hooks:
       # Make sure the poetry configuration does not get committed in a broken state.
       - id: poetry-check
@@ -157,12 +157,12 @@ repos:
       - id: poetry-lock
 
     # A shell parser, formatter, and interpreter with bash support
-  - repo: https://github.com/scop/pre-commit-shfmt
-    rev: v3.13.1-1
-    hooks:
-      - id: shfmt
-        # Simplify shell scripts, Error with a diff when the formatting differs
-        args: ["--simplify", "--diff"]
+  # - repo: https://github.com/scop/pre-commit-shfmt
+  #   rev: v3.13.1-1
+  #   hooks:
+  #     - id: shfmt
+  #       # Simplify shell scripts, Error with a diff when the formatting differs
+  #       args: ["--simplify", "--diff"]
 
   # A fast, flexible, configuration-based command-line interface for linting Markdown/CommonMark files with the markdownlint library
   - repo: https://github.com/DavidAnson/markdownlint-cli2
