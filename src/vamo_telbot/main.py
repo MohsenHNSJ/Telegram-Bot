@@ -24,6 +24,8 @@ import aiohttp
 from telethon import TelegramClient, events
 from telethon.tl.custom import Button, Message
 
+from vamo_telbot.utils import is_youtube_url
+
 # endregion Imports
 
 # ==================== تنظیمات ====================
@@ -54,15 +56,6 @@ _active_tasks = {}
 
 
 # ==================== تشخیص URL ====================
-def is_youtube_url(url: str) -> bool:
-    patterns = [
-        r"(youtu\.be/)",
-        r"(youtube\.com/watch\?v=)",
-        r"(youtube\.com/shorts/)",
-    ]
-    return any(re.search(pattern, url) for pattern in patterns)
-
-
 def is_adult_url(url: str) -> bool:
     patterns = [
         r"pornhub\.com",
@@ -1097,22 +1090,9 @@ async def callback_handler(event: events.CallbackQuery):
         await event.edit("🎬 کیفیت را انتخاب کنید:", buttons=buttons)
 
 
-# ==================== هندلر فایل تلگرام ====================
-@bot.on(
-    events.NewMessage(
-        func=lambda e: (
-            e.sender_id
-            in [
-                AUTHORIZED_USER_ID,
-                SECOND_USER_ID,
-            ]
-            and e.message.file is not None
-        ),
-    ),
-)
 # ==================== main ====================
 async def main():
-    print("🚀 ربات فعال شد")
+    print("Telegram bot is starting...")
     asyncio.create_task(queue_worker())
     await bot.start(bot_token=BOT_TOKEN)
     await bot.run_until_disconnected()
