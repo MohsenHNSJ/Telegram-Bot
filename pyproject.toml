@@ -28,10 +28,8 @@ classifiers = [
 dependencies = ["aiohttp == 3.13.5", "aiofiles == 25.1.0", "telethon==1.43.2"]
 
 [project.urls]
-Documentation = "https://TODO.com"
-Bug = "https://TODO.com"
-Changelog = "https://TODO.com"
-Repository = "https://TODO.com"
+Bug = "https://github.com/MohsenHNSJ/Telegram-Bot/issues"
+Repository = "https://github.com/MohsenHNSJ/Telegram-Bot"
 
 [tool.poetry]
 requires-poetry = ">=2.4"

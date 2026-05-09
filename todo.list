@@ -1,7 +1,5 @@
 - Add .github/workflows/build-tests.yml
-- Complete .github/ISSUE_TEMPLATE/config.yml
 - Add .github/workflows/compatibility-coverage.yml
 - Add .github/workflows/dev-release.yml
 - Add .github/workflows/release.yml
-- Fix pyproject.toml/project urls
 - Add noxfile.py
