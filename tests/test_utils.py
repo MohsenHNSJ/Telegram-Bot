@@ -6,7 +6,7 @@ import pytest
 from vamo_telbot.utils import is_adult_url, is_social_url, is_youtube_url, make_bar
 
 
-@pytest.mark.codspeed
+@pytest.mark.benchmark
 @pytest.mark.parametrize(
     ("url", "expected"),
     [
@@ -23,7 +23,7 @@ def test_is_youtube_url(url: str, expected: bool) -> None:
     assert is_youtube_url(url) == expected
 
 
-@pytest.mark.codspeed
+@pytest.mark.benchmark
 @pytest.mark.parametrize(
     ("url", "expected"),
     [
@@ -40,7 +40,7 @@ def test_is_adult_url(url: str, expected: bool) -> None:
     assert is_adult_url(url) == expected
 
 
-@pytest.mark.codspeed
+@pytest.mark.benchmark
 @pytest.mark.parametrize(
     ("url", "expected"),
     [
@@ -59,7 +59,7 @@ def test_is_social_url(url: str, expected: bool) -> None:
     assert is_social_url(url) == expected
 
 
-@pytest.mark.codspeed
+@pytest.mark.benchmark
 @pytest.mark.parametrize(
     ("percent", "width", "fill", "empty", "expected"),
     [
