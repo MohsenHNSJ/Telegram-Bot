@@ -59,7 +59,6 @@ pytest_requirements: list[str] = [
     "pytest-asyncio",
     "pytest-aiohttp",
     "pytest-codspeed",
-    "pytest-qt",
 ]
 # Benchmark commands
 benchmark_commands: list[str] = ["pytest", "tests/", "--codspeed", "-rA"]
@@ -244,7 +243,7 @@ def pre_commit(session: nox.sessions.Session) -> None:
     session.run(*pre_commit_commands)
 
 
-@nox.session(name="safety-cli", python="3.13", tags=["safety"])
+@nox.session(name="safety-cli", python="3.14", tags=["safety"])
 def safety_cli(session: nox.sessions.Session) -> None:
     """Runs the Safety CLI.
 
