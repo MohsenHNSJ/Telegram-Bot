@@ -1,0 +1,78 @@
+---
+# -----------------------------------------------
+# Release Drafter Configuration
+# Generates GitHub release notes automatically
+# -----------------------------------------------
+
+# Template for release title (what appears at the top of the release)
+name-template: "v$RESOLVED_VERSION"
+
+# Template for Git tag
+tag-template: "v$RESOLVED_VERSION"
+
+# Categorize PRs in release notes
+categories:
+  - title: "🚀 Features"
+    label: "enhancement"
+  - title: "🐛 Bug Fixes"
+    label: "bug"
+  - title: "🧰 Maintenance"
+    label: "refactoring"
+  - title: "💥 Breaking Changes"
+    label: "breaking"
+  - title: "🔥 Removals and Deprecations"
+    label: "removal"
+  - title: "🏎️ Performance"
+    label: "performance"
+  - title: "👷 Continuous Integration"
+    label: "ci"
+  - title: "📚 Documentation"
+    label: "documentation"
+  - title: "📦 Dependencies"
+    label: "dependencies"
+  - title: "🧪 Tests"
+    label: "tests"
+
+# Template for individual PR entries
+# $TITLE: PR title
+# $AUTHOR: GitHub username of author
+# $NUMBER: PR number
+change-template: "- $TITLE by @$AUTHOR in #$NUMBER"
+
+# Escape characters in PR titles that might break formatting
+change-title-escapes: '\<*_&'
+
+# Semantic version resolution based on PR labels
+# Ensures major/minor/patch increments are automatically determined
+version-resolver:
+  major:
+    labels:
+      - "major"
+      - "breaking"
+  minor:
+    labels:
+      - "minor"
+      - "enhancement"
+  patch:
+    labels:
+      - "patch"
+      - "dependencies"
+      - "documentation"
+      - "ci"
+      - "performance"
+      - "refactoring"
+      - "bug"
+  default: patch
+
+# Main template for the release notes
+# $CHANGES: grouped PRs per category
+# $OWNER/$REPOSITORY/$PREVIOUS_TAG/$RESOLVED_VERSION: auto-filled by GitHub
+template: |
+  ## What's Changed
+
+  $CHANGES
+
+  ---
+
+  **Full Changelog**
+  https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION
