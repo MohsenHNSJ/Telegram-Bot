@@ -56,6 +56,7 @@ nitpick_ignore: set[tuple[str, str]] = {
     (PY_CLASS, "telethon.tl.custom.Message"),
     (PY_CLASS, "telethon.tl.custom.NewMessage"),
     (PY_CLASS, "telethon.tl.custom.CallBackQuery"),
+    (PY_CLASS, "telethon.events.CallbackQuery"),
     (PY_CLASS, "Decimal"),  # Built-in type
     (PY_CLASS, "ClientResponse"),  # aiohttp
     (PY_CLASS, "optional"),  # Documentation
