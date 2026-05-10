@@ -1,5 +1,0 @@
-- Add .github/workflows/build-tests.yml
-- Add .github/workflows/compatibility-coverage.yml
-- Add .github/workflows/dev-release.yml
-- Add .github/workflows/release.yml
-- Add noxfile.py

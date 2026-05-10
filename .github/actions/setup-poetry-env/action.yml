@@ -6,7 +6,7 @@ inputs:
   python-version:
     required: false
     description: "The Python version to use"
-    default: "3.13"
+    default: "3.14"
   coverage:
     required: false
     description: "Whether to install Coverage"
@@ -114,7 +114,9 @@ runs:
       shell: bash
       if: ${{ inputs.coverage == 'true' }}
       run: |
-        pipx install --pip-args=--constraint=.github/workflows/constraints.txt --python ${{ env.PYTHON_VERSION }} coverage
+        pipx install \
+          --pip-args=--constraint=.github/workflows/constraints.txt \
+          --python "${{ env.PYTHON_VERSION }}" coverage
         coverage --version
 
     - name: Install the package
@@ -157,11 +159,13 @@ runs:
         pip install --constraint=.github/workflows/constraints.txt pyinstaller
 
     - name: Install UPX
-      shell: powershell
       if: ${{ inputs.upx == 'true' }}
+      shell: bash
       run: |
-        $ErrorActionPreference = "Stop"
-        choco install upx -y
+        set -e
 
-        Write-Host "UPX location:"
-        Get-Command upx | Select-Object -Property Source
+        sudo apt update
+        sudo apt install -y upx-ucl
+
+        echo "UPX location:"
+        which upx

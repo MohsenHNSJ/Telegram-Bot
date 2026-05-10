@@ -1,3 +1,4 @@
+---
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 minimum_pre_commit_version: "4.2.0"
@@ -75,7 +76,8 @@ repos:
         args: [--enforce-all]
         # Simply check whether files parse as valid python.
       - id: check-ast
-        # Check for files with names that would conflict on a case-insensitive filesystem like MacOS HFS+ or Windows FAT.
+        # Check for files with names that would conflict on a case-insensitive filesystem,
+        # like MacOS HFS+ or Windows FAT.
       - id: check-case-conflict
         # Check for files that cannot be created on Windows.
       - id: check-illegal-windows-names
@@ -89,8 +91,10 @@ repos:
       - id: check-yaml
         # Check for debugger imports and py37+ breakpoint() calls in python source.
       - id: debug-statements
-        # Detects symlinks which are changed to regular files with a content of a path which that symlink was pointing to.
-        # This usually happens on Windows when a user clones a repository that has symlinks but they do not have the permission to create symlinks.
+        # Detects symlinks which are changed to regular files with a content of a path,
+        # which that symlink was pointing to.
+        # This usually happens on Windows when a user clones a repository,
+        # that has symlinks but they do not have the permission to create symlinks.
       - id: destroyed-symlinks
         # Checks for the existence of private keys.
       - id: detect-private-key
@@ -164,7 +168,8 @@ repos:
   #       # Simplify shell scripts, Error with a diff when the formatting differs
   #       args: ["--simplify", "--diff"]
 
-  # A fast, flexible, configuration-based command-line interface for linting Markdown/CommonMark files with the markdownlint library
+  # A fast, flexible, configuration-based command-line interface for linting Markdown/CommonMark files,
+  # with the markdownlint library
   - repo: https://github.com/DavidAnson/markdownlint-cli2
     rev: v0.22.1
     hooks:
