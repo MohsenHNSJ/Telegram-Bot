@@ -24,7 +24,7 @@ import aiohttp
 from telethon import TelegramClient, events
 from telethon.tl.custom import Button, Message
 
-from vamo_telbot.utils import is_youtube_url
+from vamo_telbot.utils import is_adult_url, is_social_url, is_youtube_url, make_bar
 
 # endregion Imports
 
@@ -56,32 +56,6 @@ _active_tasks = {}
 
 
 # ==================== تشخیص URL ====================
-def is_adult_url(url: str) -> bool:
-    patterns = [
-        r"pornhub\.com",
-        r"xvideos\.com",
-        r"xnxx\.com",
-        r"xhamster\.com",
-        r"spankbang\.com",
-        r"eporner\.com",
-        r"youporn\.com",
-        r"redtube\.com",
-        r"rule34video\.com",
-    ]
-    return any(re.search(pattern, url, re.IGNORECASE) for pattern in patterns)
-
-
-def is_social_url(url: str) -> bool:
-    patterns = [
-        r"tiktok\.com",
-        r"instagram\.com",
-        r"twitter\.com",
-        r"x\.com",
-        r"facebook\.com",
-    ]
-    return any(re.search(pattern, url, re.IGNORECASE) for pattern in patterns)
-
-
 def unique_filepath(name: str) -> str:
     base, ext = os.path.splitext(name)
     ts = int(time.time())
@@ -91,12 +65,6 @@ def unique_filepath(name: str) -> str:
         candidate = os.path.join(DOWNLOAD_DIR, f"{base}_{ts}_{counter}{ext}")
         counter += 1
     return candidate
-
-
-# ==================== Progress Bar ====================
-def make_bar(percent: float, width: int = 12) -> str:
-    filled = int(width * percent / 100)
-    return "█" * filled + "░" * (width - filled)
 
 
 # ==================== rclone async ====================
