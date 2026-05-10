@@ -66,7 +66,7 @@ jobs:
           parent_sha=$(git rev-parse --verify HEAD^ 2>/dev/null || echo "")
           echo "Parent commit SHA: $parent_sha"
           if [ -n "$parent_sha" ]; then
-              echo "sha=$parent_sha" >> $GITHUB_OUTPUT
+              echo "sha=$parent_sha" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Detect and tag new version
@@ -76,7 +76,7 @@ jobs:
         with:
           version-command: |
             version=$(poetry version | awk '{print $2}')
-            echo $version
+            echo "$version"
 
       - name: Build Linux executable with PyInstaller (NO compression, DEBUG log)
         run: |
