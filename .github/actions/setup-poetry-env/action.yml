@@ -6,7 +6,7 @@ inputs:
   python-version:
     required: false
     description: "The Python version to use"
-    default: "3.13"
+    default: "3.14"
   coverage:
     required: false
     description: "Whether to install Coverage"
@@ -114,7 +114,9 @@ runs:
       shell: bash
       if: ${{ inputs.coverage == 'true' }}
       run: |
-        pipx install --pip-args=--constraint=.github/workflows/constraints.txt --python ${{ env.PYTHON_VERSION }} coverage
+        pipx install \
+          --pip-args=--constraint=.github/workflows/constraints.txt \
+          --python "${{ env.PYTHON_VERSION }}" coverage
         coverage --version
 
     - name: Install the package

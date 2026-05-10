@@ -1,7 +1,8 @@
 ---
 # ls Lint configuration file
 # This file is used to configure the ls-lint tool, which checks file names and paths in a project.
-# It specifies the naming conventions for different file types and directories, as well as files and directories to ignore.
+# It specifies the naming conventions for different file types and directories,
+# as well as files and directories to ignore.
 # For more information, see: https://ls-lint.org/
 
 # Naming conventions:

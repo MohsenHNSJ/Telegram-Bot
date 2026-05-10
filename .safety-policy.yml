@@ -31,8 +31,10 @@ fail-scan-with-exit-code: # Defines rules for when Safety CLI should return non-
         - medium
         - low
 
-# patch/minor/major to determine the upper threshold for automatic application of fixes when Safety CLI is updating packages in a requirements.txt file.
-# Note that if "major" is used, Safety will automatically apply fixes for all vulnerabilities, even if the next secure version is a major upgrade with breaking changes.
+# patch/minor/major to determine the upper threshold for automatic application of fixes,
+# when Safety CLI is updating packages in a requirements.txt file.
+# Note that if "major" is used,Safety will automatically apply fixes for all vulnerabilities,
+# even if the next secure version is a major upgrade with breaking changes.
 security-updates:
   dependency-vulnerabilities:
     auto-security-updates-limit:

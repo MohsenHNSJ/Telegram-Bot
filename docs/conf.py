@@ -53,6 +53,10 @@ needs_sphinx = "9.0.0"
 nitpicky = True
 # Ignore broken references
 nitpick_ignore: set[tuple[str, str]] = {
+    (PY_CLASS, "telethon.tl.custom.Message"),
+    (PY_CLASS, "telethon.tl.custom.NewMessage"),
+    (PY_CLASS, "telethon.tl.custom.CallBackQuery"),
+    (PY_CLASS, "telethon.events.CallbackQuery"),
     (PY_CLASS, "Decimal"),  # Built-in type
     (PY_CLASS, "ClientResponse"),  # aiohttp
     (PY_CLASS, "optional"),  # Documentation
@@ -95,6 +99,7 @@ extensions += ["sphinx.ext.intersphinx"]
 intersphinx_mapping: dict[str, tuple[str, None]] = {
     "python": ("https://docs.python.org/3/", None),
     "aiohttp": ("https://docs.aiohttp.org/en/stable/", None),
+    "telethon": ("https://docs.telethon.dev/en/stable/", None),
 }
 
 # Add support for nice Not Found 404 pages

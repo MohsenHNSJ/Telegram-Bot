@@ -1,9 +1,20 @@
-# pylint: disable=C0114,E0611,W0611,C0115,C0103,R0205,C0116,R0915,C0301,W1406,W0201,C0302,C0325,E0102,W0718,W0719,W0706,W0707,C0104
-# ruff: noqa: UP009, RUF100, F401, D100, N801, D101, N803, ANN001, UP004, N802, D102, ANN201,UP025,N806,PGH003,PLR0915, E501, Q003, FBT003, ERA001, PLR2004, C901, PLR0912, EXE002, S105, PTH103, D103, PTH122, PTH118, PTH110, ANN002, ASYNC109, SIM105, S110, W291, BLE001, TRY301, TRY002, TRY003, RSE102, EM102, ASYNC240, PTH107, B904, D415, PTH208, ANN202, EM101, PTH204, PLR0913, RUF001, RUF013, PTH119, PTH202, SIM102, RUF003, PLR1714, PIE810, RUF006
+"""Main module of Telegram Bot"""
+
+# pylint: disable=W0611,C0115,C0103,R0205,C0116,R0915,C0301,W1406,W0201,C0302,C0325,E0102,W0718,W0719,W0706,W0707,C0104
+# ruff: noqa: ANN201,PLR0915, E501, PLR2004, C901, PLR0912, EXE002, S105, PTH103, D103, PTH122, PTH118, PTH110, ANN002, ASYNC109, SIM105, S110, BLE001, TRY301, TRY002, TRY003, RSE102, EM102, ASYNC240, PTH107, B904, D415, PTH208, ANN202, EM101, PTH204, PLR0913, RUF001, RUF013, PTH119, PTH202, SIM102, RUF003, PLR1714, PIE810, RUF006
 # mypy: ignore-errors
 # type: ignore[all]
+# pyright: reportGeneralTypeIssues=false
+# pyright: reportUnknownMemberType=false
+# pyright: reportPrivateImportUsage=false
+# pyright: reportUnknownVariableType=false
+# pyright: reportRedeclaration=false
+# pyright: reportPossiblyUnboundVariable=false
+# pyright: reportAttributeAccessIssue=false
+# pyright: reportOptionalMemberAccess=false
+# pyright: reportArgumentType=false
+# region Imports
 import asyncio
-import mimetypes
 import os
 import re
 import time
@@ -11,7 +22,11 @@ import time
 import aiofiles
 import aiohttp
 from telethon import TelegramClient, events
-from telethon.tl.custom import Button
+from telethon.tl.custom import Button, Message
+
+from vamo_telbot.utils import is_adult_url, is_social_url, is_youtube_url, make_bar
+
+# endregion Imports
 
 # ==================== تنظیمات ====================
 API_ID = 111111
@@ -41,61 +56,6 @@ _active_tasks = {}
 
 
 # ==================== تشخیص URL ====================
-def is_youtube_url(url: str) -> bool:
-    patterns = [
-        r"(youtu\.be/)",
-        r"(youtube\.com/watch\?v=)",
-        r"(youtube\.com/shorts/)",
-    ]
-    return any(re.search(pattern, url) for pattern in patterns)
-
-
-def is_adult_url(url: str) -> bool:
-    patterns = [
-        r"pornhub\.com",
-        r"xvideos\.com",
-        r"xnxx\.com",
-        r"xhamster\.com",
-        r"spankbang\.com",
-        r"eporner\.com",
-        r"youporn\.com",
-        r"redtube\.com",
-        r"rule34video\.com",
-    ]
-    return any(re.search(pattern, url, re.IGNORECASE) for pattern in patterns)
-
-
-def is_social_url(url: str) -> bool:
-    patterns = [
-        r"tiktok\.com",
-        r"instagram\.com",
-        r"twitter\.com",
-        r"x\.com",
-        r"facebook\.com",
-    ]
-    return any(re.search(pattern, url, re.IGNORECASE) for pattern in patterns)
-
-
-# ==================== FILE NAME ====================
-def get_proper_filename(msg):
-    if msg.file.name:
-        return msg.file.name
-    mime = msg.file.mime_type or ""
-    ext = mimetypes.guess_extension(mime)
-    if ext == ".jpe":
-        ext = ".jpg"
-    if not ext:
-        if "video" in mime:
-            ext = ".mp4"
-        elif "audio" in mime:
-            ext = ".mp3"
-        elif "image" in mime:
-            ext = ".jpg"
-        else:
-            ext = ".bin"
-    return f"file_{msg.id}{ext}"
-
-
 def unique_filepath(name: str) -> str:
     base, ext = os.path.splitext(name)
     ts = int(time.time())
@@ -107,14 +67,8 @@ def unique_filepath(name: str) -> str:
     return candidate
 
 
-# ==================== Progress Bar ====================
-def make_bar(percent: float, width: int = 12) -> str:
-    filled = int(width * percent / 100)
-    return "█" * filled + "░" * (width - filled)
-
-
 # ==================== rclone async ====================
-async def run_rclone_async(*args, timeout=60):
+async def run_rclone_async(*args, timeout: float = 60):
     try:
         process = await asyncio.create_subprocess_exec(
             *args,
@@ -148,7 +102,12 @@ async def run_rclone_async(*args, timeout=60):
 
 
 # ==================== توابع دانلود ====================
-async def download_from_url(url: str, filename: str, status_msg=None, cancel_event=None):
+async def download_from_url(
+    url: str,
+    filename: str,
+    status_msg: Message | None = None,
+    cancel_event: asyncio.Event | None = None,
+):
     local_path = unique_filepath(filename)
     try:
         async with aiohttp.ClientSession() as session, session.get(url) as response:
@@ -189,7 +148,12 @@ async def download_from_url(url: str, filename: str, status_msg=None, cancel_eve
         raise Exception(f"خطا در دانلود: {e!s}")
 
 
-async def download_yt_dlp(cmd: list, file_exts: tuple, status_msg=None, cancel_event=None):
+async def download_yt_dlp(
+    cmd: list,
+    file_exts: tuple,
+    status_msg: Message | None = None,
+    cancel_event: asyncio.Event | None = None,
+):
     """اجرای yt-dlp با نمایش progress و پشتیبانی از کنسل"""
     process = await asyncio.create_subprocess_exec(
         *cmd,
@@ -278,8 +242,8 @@ async def download_youtube(
     url: str,
     quality: str = "480",
     bitrate: str = None,
-    status_msg=None,
-    cancel_event=None,
+    status_msg: Message | None = None,
+    cancel_event: asyncio.Event | None = None,
 ):
     output_template = os.path.join(DOWNLOAD_DIR, "%(title)s.%(ext)s")
     if quality == "audio":
@@ -345,7 +309,12 @@ async def download_youtube(
         raise Exception(f"خطا در دانلود یوتیوب: {e!s}")
 
 
-async def download_adult_site(url: str, quality: str, status_msg=None, cancel_event=None):
+async def download_adult_site(
+    url: str,
+    quality: str,
+    status_msg: Message | None = None,
+    cancel_event: asyncio.Event | None = None,
+):
     output_template = os.path.join(DOWNLOAD_DIR, "%(title)s.%(ext)s")
     format_spec = f"best[height<={quality}]/best"
     cmd = [
@@ -383,7 +352,11 @@ async def download_adult_site(url: str, quality: str, status_msg=None, cancel_ev
         raise Exception(f"خطا در دانلود: {e!s}")
 
 
-async def download_social(url: str, status_msg=None, cancel_event=None):
+async def download_social(
+    url: str,
+    status_msg: Message | None = None,
+    cancel_event: asyncio.Event | None = None,
+):
     output_template = os.path.join(DOWNLOAD_DIR, "%(title)s.%(ext)s")
     cookies_file = INSTAGRAM_COOKIES if "instagram" in url.lower() else COOKIES_FILE
     cmd = [
@@ -427,12 +400,12 @@ async def download_social(url: str, status_msg=None, cancel_event=None):
 
 # ==================== آپلود ====================
 async def upload_to_drive(
-    file_path,
-    status_msg,
-    file_name,
-    original_msg=None,
-    user_id=None,
-    cancel_event=None,
+    file_path: str,
+    status_msg: Message | None,
+    file_name: str,
+    original_msg: Message | None = None,
+    user_id: int | None = None,
+    cancel_event: asyncio.Event | None = None,
 ):
     user_folder = USER_FOLDERS.get(user_id, "") if user_id else ""
     dest_path = f"{DRIVE_PATH}/{user_folder}" if user_folder else DRIVE_PATH
@@ -572,7 +545,7 @@ async def queue_worker():
             if job_type == "telegram_file":
                 msg = item["msg"]
                 file_name = item["file_name"]
-                file_path = unique_filepath(file_name)
+                file_path: str = unique_filepath(file_name)
                 size_mb = item["size_mb"]
                 try:
                     await status_msg.edit(
@@ -708,7 +681,7 @@ def enqueue(item: dict):
 
 # ==================== /cancel ====================
 @bot.on(events.NewMessage(pattern="/cancel"))
-async def cancel_download(event):
+async def cancel_download(event: Message):
     if event.sender_id not in [AUTHORIZED_USER_ID, SECOND_USER_ID]:
         return
     uid = event.sender_id
@@ -721,7 +694,7 @@ async def cancel_download(event):
 
 # ==================== مدیریت فایل‌ها ====================
 @bot.on(events.NewMessage(pattern="/file"))
-async def file_manager(event):
+async def file_manager(event: Message):
     if event.sender_id not in [AUTHORIZED_USER_ID, SECOND_USER_ID]:
         return
     user_id = event.sender_id
@@ -759,7 +732,7 @@ async def file_manager(event):
 
 
 @bot.on(events.CallbackQuery(pattern=re.compile(b"file_action:(.+)")))
-async def file_action(event):
+async def file_action(event: events.CallbackQuery):
     if event.sender_id not in [AUTHORIZED_USER_ID, SECOND_USER_ID]:
         return
     filename = event.data.decode().split(":", 1)[1]
@@ -775,7 +748,7 @@ async def file_action(event):
 
 
 @bot.on(events.CallbackQuery(pattern=re.compile(b"delete_confirm:(.+)")))
-async def delete_confirm(event):
+async def delete_confirm(event: events.CallbackQuery):
     if event.sender_id not in [AUTHORIZED_USER_ID, SECOND_USER_ID]:
         return
     filename = event.data.decode().split(":", 1)[1]
@@ -787,7 +760,7 @@ async def delete_confirm(event):
 
 
 @bot.on(events.CallbackQuery(pattern=re.compile(b"delete_do:(.+)")))
-async def delete_do(event):
+async def delete_do(event: events.CallbackQuery):
     if event.sender_id not in [AUTHORIZED_USER_ID, SECOND_USER_ID]:
         return
     user_id = event.sender_id
@@ -803,49 +776,20 @@ async def delete_do(event):
 
 
 @bot.on(events.CallbackQuery(pattern=re.compile(b"rename:(.+)")))
-async def rename_start(event):
-    if event.sender_id not in [AUTHORIZED_USER_ID, SECOND_USER_ID]:
+async def rename_start(event: events.CallbackQuery):
+    if event.Event.sender_id not in [AUTHORIZED_USER_ID, SECOND_USER_ID]:
         return
     filename = event.data.decode().split(":", 1)[1]
     if not hasattr(bot, "rename_data"):
         bot.rename_data = {}
-    bot.rename_data[event.sender_id] = filename
+    bot.rename_data[event.Event.sender_id] = filename
     await event.edit(
         f"✏️ نام جدید برای فایل را بفرستید:\n`{filename}`\n\n(برای انصراف /cancel_rename بفرستید)",
     )
 
 
-@bot.on(
-    events.NewMessage(
-        func=lambda e: (
-            e.sender_id in [AUTHORIZED_USER_ID, SECOND_USER_ID]
-            and not e.message.file
-            and not (e.message.text or "").startswith("/")
-            and hasattr(bot, "rename_data")
-            and e.sender_id in getattr(bot, "rename_data", {})
-        ),
-    ),
-)
-async def rename_receive(event):
-    old_filename = bot.rename_data.pop(event.sender_id)
-    new_filename = event.message.text.strip()
-    if not new_filename:
-        await event.reply("❌ نام فایل نمی‌تواند خالی باشد.")
-        return
-    user_id = event.sender_id
-    user_folder = USER_FOLDERS.get(user_id, "")
-    old_path = f"{DRIVE_PATH}/{user_folder}/{old_filename}"
-    new_path = f"{DRIVE_PATH}/{user_folder}/{new_filename}"
-    msg = await event.reply("🔄 در حال تغییر نام...")
-    result = await run_rclone_async("rclone", "moveto", old_path, new_path)
-    if result.returncode == 0:
-        await msg.edit(f"✅ نام فایل به `{new_filename}` تغییر یافت.")
-    else:
-        await msg.edit(f"❌ خطا در تغییر نام:\n{result.stderr[:300]}")
-
-
 @bot.on(events.NewMessage(pattern="/cancel_rename"))
-async def cancel_rename(event):
+async def cancel_rename(event: events.NewMessage):
     if event.sender_id not in [AUTHORIZED_USER_ID, SECOND_USER_ID]:
         return
     if hasattr(bot, "rename_data") and event.sender_id in bot.rename_data:
@@ -856,15 +800,15 @@ async def cancel_rename(event):
 
 
 @bot.on(events.CallbackQuery(pattern=b"back_to_filelist"))
-async def back_to_filelist(event):
-    if event.sender_id not in [AUTHORIZED_USER_ID, SECOND_USER_ID]:
+async def back_to_filelist(event: events.CallbackQuery):
+    if event.Event.sender_id not in [AUTHORIZED_USER_ID, SECOND_USER_ID]:
         return
     await file_manager(event)
 
 
 # ==================== /start ====================
 @bot.on(events.NewMessage(pattern="/start"))
-async def start(event):
+async def start(event: events.NewMessage):
     if event.sender_id not in [AUTHORIZED_USER_ID, SECOND_USER_ID]:
         await event.reply("❌ شما دسترسی به این ربات ندارید.")
         return
@@ -883,12 +827,12 @@ async def start(event):
 
 # ==================== هندلر اصلی لینک ====================
 @bot.on(events.NewMessage(pattern=r"^https?://"))
-async def handle_url(event):
+async def handle_url(event: events.NewMessage):
     if event.sender_id not in [AUTHORIZED_USER_ID, SECOND_USER_ID]:
         await event.reply("❌ شما دسترسی به این ربات ندارید.")
         return
     url = event.message.text.strip()
-    msg = await event.reply("🔍 در حال بررسی لینک...")
+    msg: Message | None = await event.reply("🔍 در حال بررسی لینک...")
 
     if is_youtube_url(url):
         buttons = [
@@ -986,7 +930,7 @@ async def handle_url(event):
 
 # ==================== Callback Handler ====================
 @bot.on(events.CallbackQuery)
-async def callback_handler(event):
+async def callback_handler(event: events.CallbackQuery):
     user_id = event.sender_id
     data = event.data.decode()
 
@@ -1114,49 +1058,9 @@ async def callback_handler(event):
         await event.edit("🎬 کیفیت را انتخاب کنید:", buttons=buttons)
 
 
-# ==================== هندلر فایل تلگرام ====================
-@bot.on(
-    events.NewMessage(
-        func=lambda e: (
-            e.sender_id
-            in [
-                AUTHORIZED_USER_ID,
-                SECOND_USER_ID,
-            ]
-            and e.message.file is not None
-        ),
-    ),
-)
-async def handle_file(event):
-    msg = event.message
-    file_name = get_proper_filename(msg)
-    size_mb = msg.file.size / (1024 * 1024)
-    status_msg = await event.reply(
-        f"📥 فایل دریافت شد: {file_name} ({size_mb:.1f} MB)\n⏳ اضافه شد به صف\n\nبرای لغو: /cancel",
-    )
-    cancel_ev = asyncio.Event()
-    _cancel_flags[event.sender_id] = cancel_ev
-    pos = enqueue(
-        {
-            "type": "telegram_file",
-            "msg": msg,
-            "file_name": file_name,
-            "size_mb": size_mb,
-            "user_id": event.sender_id,
-            "status_msg": status_msg,
-            "original_msg": event,
-            "cancel_event": cancel_ev,
-        },
-    )
-    if pos > 1:
-        await status_msg.edit(
-            f"📥 {file_name} ({size_mb:.1f} MB)\n⏳ در صف انتظار — موقعیت: {pos}\n\nبرای لغو: /cancel",
-        )
-
-
 # ==================== main ====================
 async def main():
-    print("🚀 ربات فعال شد")
+    print("Telegram bot is starting...")
     asyncio.create_task(queue_worker())
     await bot.start(bot_token=BOT_TOKEN)
     await bot.run_until_disconnected()
