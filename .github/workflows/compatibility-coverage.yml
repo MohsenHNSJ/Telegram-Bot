@@ -73,7 +73,8 @@ jobs:
         run: |
           nox -s test-${{ matrix.python-version }}
 
-      # IDEs may warn about env.PYTHON_VERSION might be invalid, but it is a valid environment variable and set at runtime.
+      # IDEs may warn about env.PYTHON_VERSION might be invalid,
+      # but it is a valid environment variable and set at runtime.
       - name: Upload coverage data
         uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
@@ -126,7 +127,8 @@ jobs:
           fail_ci_if_error: true
           # Comma-separated explicit list of files to upload.
           # These will be added to the coverage files found for upload.
-          # If you wish to only upload the specified files, please consider using "disable-search" to disable uploading other files.
+          # If you wish to only upload the specified files,
+          # please consider using "disable-search" to disable uploading other files.
           files: ./coverage.xml
           # Use OIDC instead of token. This will ignore any token supplied
           use_oidc: true

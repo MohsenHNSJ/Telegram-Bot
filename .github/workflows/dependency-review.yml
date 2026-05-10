@@ -35,6 +35,7 @@ jobs:
           comment-summary-in-pr: always
           # Contains a list of packages that will be excluded from license checks.
           allow-dependencies-licenses: pkg:pyupio/safety-action@2591cf2f3e67ba68b923f4c92f0d36e281c65023 # v1.0.1
-          # Vulnerability summary table will include an additional column showing the first patched version for each vulnerability.
+          # Vulnerability summary table will include an additional column,
+          # showing the first patched version for each vulnerability.
           # This requires additional API calls to fetch advisory data.
           show-patched-versions: true

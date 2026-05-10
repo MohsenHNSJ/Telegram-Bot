@@ -114,7 +114,9 @@ runs:
       shell: bash
       if: ${{ inputs.coverage == 'true' }}
       run: |
-        pipx install --pip-args=--constraint=.github/workflows/constraints.txt --python ${{ env.PYTHON_VERSION }} coverage
+        pipx install \
+          --pip-args=--constraint=.github/workflows/constraints.txt \
+          --python "${{ env.PYTHON_VERSION }}" coverage
         coverage --version
 
     - name: Install the package
