@@ -3,7 +3,7 @@
 # Poetry build backend
 build-backend = "poetry.core.masonry.api"
 # Minimum required poetry core version
-requires = ["poetry-core==2.4.0"]
+requires = ["poetry-core>=2.4.0"]
 
 [project]
 name = "vamo_telbot" # PyPI package name
@@ -50,7 +50,7 @@ poetry-plugin-export = "1.10.0"
 [tool.poetry.group.dev.dependencies]
 coverage = "7.13.5"
 docutils = "0.22.4"
-mypy = "1.20.2"
+mypy = "2.0.0"
 nox = "2026.4.10"
 pre-commit = "4.6.0"
 pytest = "9.0.3"
