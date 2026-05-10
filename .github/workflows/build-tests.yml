@@ -1,0 +1,89 @@
+---
+name: Build Tests
+
+on:
+    push: # Run on every Push
+    pull_request: # Run on every PR
+
+permissions: read-all # Read permissions for all scopes
+
+jobs:
+    build-tests:
+        name: ${{ matrix.session }}
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - { session: "pre-commit" }
+                    - { session: "ruff-check" }
+                    - { session: "docs-build" }
+                    - { session: "mypy-type" }
+                    - { session: "test" }
+
+        env:
+            NOXSESSION: ${{ matrix.session }}
+            FORCE_COLOR: "1"
+            PRE_COMMIT_COLOR: "always"
+
+        steps:
+            - name: Harden the runner (Audit all outbound calls)
+              uses: step-security/harden-runner@fa2e9d605c4eeb9fcad4c99c224cee0c6c7f3594 # v2.16.0
+              with:
+                  egress-policy: audit # Monitor outbound connections
+
+            - name: Check out the repository
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+            - name: Ensure Poetry cache directory exists
+              run: mkdir -p ~/.cache/pypoetry
+
+            - name: Cache pip
+              id: cache-pip
+              uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+              with:
+                  path: ~/.cache/pip
+                  key: ${{ runner.os }}-pip-${{ hashFiles('**/pyproject.toml', '**/requirements.txt') }}
+                  restore-keys: |
+                      ${{ runner.os }}-pip-
+
+            - name: Print pip cache status
+              run: |
+                  echo "pip cache hit: ${{ steps.cache-pip.outputs.cache-hit }}"
+
+            - name: Cache Poetry
+              id: cache-poetry
+              uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+              with:
+                  path: ~/.cache/pypoetry
+                  key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-poetry-
+
+            - name: Print Poetry cache status
+              run: |
+                  echo "poetry cache hit: ${{ steps.cache-poetry.outputs.cache-hit }}"
+
+            - name: Cache Nox
+              id: cache-nox
+              uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+              with:
+                  path: .nox
+                  key: ${{ runner.os }}-nox-${{ hashFiles('**/pyproject.toml', '**/poetry.lock') }}
+                  restore-keys: |
+                      ${{ runner.os }}-nox-
+
+            - name: Print Nox cache status
+              run: |
+                  echo "nox cache hit: ${{ steps.cache-nox.outputs.cache-hit }}"
+
+            - name: Set up the environment
+              uses: ./.github/actions/setup-poetry-env
+              with:
+                  nox: true
+
+            - name: Run Nox
+              run: |
+                  nox --python=3.14

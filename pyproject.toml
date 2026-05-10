@@ -11,7 +11,7 @@ version = "0.1.0" # Base version
 description = "Utility Telegram Bot for emergency situations"
 license = "MIT"
 readme = "README.rst"
-requires-python = ">=3.12" # Upper-bound is set in the tool.poetry.dependencies section
+requires-python = ">=3.13" # Upper-bound is set in the tool.poetry.dependencies section
 authors = [{ name = "MohsenHNSJ", email = "fake@email.com" }, { name = "vahidtaheri98", email = "fake@email.com" }]
 maintainers = [{ name = "MohsenHNSJ", email = "fake@email.com" }, { name = "vahidtaheri98", email = "fake@email.com" }]
 keywords = ["VaMo", "Bot", "Telegram"]
@@ -36,7 +36,7 @@ requires-poetry = ">=2.4"
 
 # Main requirements
 [tool.poetry.dependencies]
-python = ">=3.12,<3.15"
+python = ">=3.13,<3.15"
 # Other requirements constraints to keep dependencies up-to-date
 # These are not directly required by the project
 # But only required by the above packages
