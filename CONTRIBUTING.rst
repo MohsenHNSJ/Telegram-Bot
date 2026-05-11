@@ -34,7 +34,7 @@ Quick Start
 
        pre-commit install
 
-5. Create a branch from ``main``.
+5. Create a branch from ``test``.
 6. Make your changes and add tests.
 7. Run:
 
@@ -42,7 +42,7 @@ Quick Start
 
        nox -t test
 
-8. Open a pull request targeting ``main``.
+8. Open a pull request targeting ``test``.
 
 CI Status
 ---------
