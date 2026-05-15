@@ -17,7 +17,7 @@ __description__ = "Utility Telegram Bot for emergency situations"
 __copyright__ = "Copyright 2026-present MohsenHNSJ"
 __license__ = "MIT"
 __title__ = "VaMoTelBot"
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 # ---- Runtime flags (optional, but sometimes useful) ----------------
 __all__: tuple[str, ...] = ()  # Explicitly declare: no public API

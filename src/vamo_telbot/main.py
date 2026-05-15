@@ -1,7 +1,7 @@
 """Main module of Telegram Bot"""
 
 # pylint: disable=W0611,C0115,C0103,R0205,C0116,R0915,C0301,W1406,W0201,C0302,C0325,E0102,W0718,W0719,W0706,W0707,C0104
-# ruff: noqa: ANN201,PLR0915, E501, PLR2004, C901, PLR0912, EXE002, S105, PTH103, D103, PTH122, PTH118, PTH110, ANN002, ASYNC109, SIM105, S110, BLE001, TRY301, TRY002, TRY003, RSE102, EM102, ASYNC240, PTH107, B904, D415, PTH208, ANN202, EM101, PTH204, PLR0913, RUF001, RUF013, PTH119, PTH202, SIM102, RUF003, PLR1714, PIE810, RUF006
+# ruff: noqa: ANN201,PLR0915, ERA001, E501, PLR2004, C901, PLR0912, EXE002, D103, PTH122, PTH118, PTH110, ANN002, ASYNC109, SIM105, S110, BLE001, TRY301, TRY002, TRY003, RSE102, EM102, ASYNC240, PTH107, B904, D415, PTH208, ANN202, EM101, PTH204, PLR0913, RUF001, RUF013, PTH119, PTH202, SIM102, RUF003, PLR1714, PIE810
 # mypy: ignore-errors
 # type: ignore[all]
 # pyright: reportGeneralTypeIssues=false
@@ -24,30 +24,39 @@ import aiohttp
 from telethon import TelegramClient, events
 from telethon.tl.custom import Button, Message
 
+from vamo_telbot.commands.start import handle_start
+from vamo_telbot.config.telegram import (
+    load_api_hash,
+    load_api_id,
+    load_bot_token,
+    save_api_hash,
+    save_api_id,
+    save_bot_token,
+)
+from vamo_telbot.global_constants import AUTHORIZED_USER_ID, SECOND_USER_ID
 from vamo_telbot.utils import is_adult_url, is_social_url, is_youtube_url, make_bar
 
 # endregion Imports
 
 # ==================== تنظیمات ====================
-API_ID = 111111
-API_HASH = "API_HASH"
-BOT_TOKEN = "BOT_TOKEN"
+SESSION_NAME: str = "telegram_bot"
 DRIVE_PATH = "drive:/TelegramUploads"
 DOWNLOAD_DIR = "downloads"
 COOKIES_FILE = "/root/cookies.txt"
 INSTAGRAM_COOKIES = "/root/instagram_cookies.txt"
-
-AUTHORIZED_USER_ID = 111111111
-SECOND_USER_ID = 222222222
 
 USER_FOLDERS = {
     AUTHORIZED_USER_ID: "USER1",
     SECOND_USER_ID: "USER2",
 }
 
-os.makedirs(DOWNLOAD_DIR, exist_ok=True)
+# os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
-bot = TelegramClient("bot_session", API_ID, API_HASH)
+telegram_bot: TelegramClient = TelegramClient(
+    SESSION_NAME,
+    1,
+    "NOT_SET",
+)
 
 # ==================== Queue & Cancel ====================
 _download_queue = asyncio.Queue()
@@ -680,7 +689,7 @@ def enqueue(item: dict):
 
 
 # ==================== /cancel ====================
-@bot.on(events.NewMessage(pattern="/cancel"))
+@telegram_bot.on(events.NewMessage(pattern="/cancel"))
 async def cancel_download(event: Message):
     if event.sender_id not in [AUTHORIZED_USER_ID, SECOND_USER_ID]:
         return
@@ -693,7 +702,7 @@ async def cancel_download(event: Message):
 
 
 # ==================== مدیریت فایل‌ها ====================
-@bot.on(events.NewMessage(pattern="/file"))
+@telegram_bot.on(events.NewMessage(pattern="/file"))
 async def file_manager(event: Message):
     if event.sender_id not in [AUTHORIZED_USER_ID, SECOND_USER_ID]:
         return
@@ -731,7 +740,7 @@ async def file_manager(event: Message):
     await msg.edit(text, buttons=buttons)
 
 
-@bot.on(events.CallbackQuery(pattern=re.compile(b"file_action:(.+)")))
+@telegram_bot.on(events.CallbackQuery(pattern=re.compile(b"file_action:(.+)")))
 async def file_action(event: events.CallbackQuery):
     if event.sender_id not in [AUTHORIZED_USER_ID, SECOND_USER_ID]:
         return
@@ -747,7 +756,7 @@ async def file_action(event: events.CallbackQuery):
     )
 
 
-@bot.on(events.CallbackQuery(pattern=re.compile(b"delete_confirm:(.+)")))
+@telegram_bot.on(events.CallbackQuery(pattern=re.compile(b"delete_confirm:(.+)")))
 async def delete_confirm(event: events.CallbackQuery):
     if event.sender_id not in [AUTHORIZED_USER_ID, SECOND_USER_ID]:
         return
@@ -759,7 +768,7 @@ async def delete_confirm(event: events.CallbackQuery):
     await event.edit(f"⚠️ آیا مطمئن هستید؟\n\n`{filename}`", buttons=buttons)
 
 
-@bot.on(events.CallbackQuery(pattern=re.compile(b"delete_do:(.+)")))
+@telegram_bot.on(events.CallbackQuery(pattern=re.compile(b"delete_do:(.+)")))
 async def delete_do(event: events.CallbackQuery):
     if event.sender_id not in [AUTHORIZED_USER_ID, SECOND_USER_ID]:
         return
@@ -775,58 +784,44 @@ async def delete_do(event: events.CallbackQuery):
         await event.edit(f"❌ خطا در حذف:\n{result.stderr[:300]}")
 
 
-@bot.on(events.CallbackQuery(pattern=re.compile(b"rename:(.+)")))
+@telegram_bot.on(events.CallbackQuery(pattern=re.compile(b"rename:(.+)")))
 async def rename_start(event: events.CallbackQuery):
     if event.Event.sender_id not in [AUTHORIZED_USER_ID, SECOND_USER_ID]:
         return
     filename = event.data.decode().split(":", 1)[1]
-    if not hasattr(bot, "rename_data"):
-        bot.rename_data = {}
-    bot.rename_data[event.Event.sender_id] = filename
+    if not hasattr(telegram_bot, "rename_data"):
+        telegram_bot.rename_data = {}
+    telegram_bot.rename_data[event.Event.sender_id] = filename
     await event.edit(
         f"✏️ نام جدید برای فایل را بفرستید:\n`{filename}`\n\n(برای انصراف /cancel_rename بفرستید)",
     )
 
 
-@bot.on(events.NewMessage(pattern="/cancel_rename"))
+@telegram_bot.on(events.NewMessage(pattern="/cancel_rename"))
 async def cancel_rename(event: events.NewMessage):
     if event.sender_id not in [AUTHORIZED_USER_ID, SECOND_USER_ID]:
         return
-    if hasattr(bot, "rename_data") and event.sender_id in bot.rename_data:
-        del bot.rename_data[event.sender_id]
+    if hasattr(telegram_bot, "rename_data") and event.sender_id in telegram_bot.rename_data:
+        del telegram_bot.rename_data[event.sender_id]
         await event.reply("❌ تغییر نام لغو شد.")
     else:
         await event.reply("ℹ️ عملیات تغییر نام در جریان نیست.")
 
 
-@bot.on(events.CallbackQuery(pattern=b"back_to_filelist"))
+@telegram_bot.on(events.CallbackQuery(pattern=b"back_to_filelist"))
 async def back_to_filelist(event: events.CallbackQuery):
     if event.Event.sender_id not in [AUTHORIZED_USER_ID, SECOND_USER_ID]:
         return
     await file_manager(event)
 
 
-# ==================== /start ====================
-@bot.on(events.NewMessage(pattern="/start"))
-async def start(event: events.NewMessage):
-    if event.sender_id not in [AUTHORIZED_USER_ID, SECOND_USER_ID]:
-        await event.reply("❌ شما دسترسی به این ربات ندارید.")
-        return
-    await event.reply(
-        "🚀 **ربات دانلود و مدیریت Google Drive**\n\n"
-        "✅ قابلیت‌ها:\n"
-        "• دانلود از یوتیوب، سایت‌های بزرگسال، اینستاگرام و ...\n"
-        "• آپلود خودکار به درایو (پوشه اختصاصی هر کاربر)\n"
-        "• progress bar دانلود و آپلود\n"
-        "• صف هوشمند — دانلودها به ترتیب انجام می‌شوند\n"
-        "• مدیریت فایل‌ها (/file)\n\n"
-        "🔗 لینک را بفرستید\n"
-        "🚫 برای لغو عملیات جاری: /cancel",
-    )
+@telegram_bot.on(events.NewMessage(pattern="/start"))
+async def start(event: events.newmessage.NewMessage.Event) -> None:
+    await handle_start(event)
 
 
 # ==================== هندلر اصلی لینک ====================
-@bot.on(events.NewMessage(pattern=r"^https?://"))
+@telegram_bot.on(events.NewMessage(pattern=r"^https?://"))
 async def handle_url(event: events.NewMessage):
     if event.sender_id not in [AUTHORIZED_USER_ID, SECOND_USER_ID]:
         await event.reply("❌ شما دسترسی به این ربات ندارید.")
@@ -850,9 +845,9 @@ async def handle_url(event: events.NewMessage):
             "🎬 لینک **یوتیوب** شناسایی شد!\n\nکیفیت مورد نظر را انتخاب کنید:",
             buttons=buttons,
         )
-        if not hasattr(bot, "temp_data"):
-            bot.temp_data = {}
-        bot.temp_data[event.sender_id] = {
+        if not hasattr(telegram_bot, "temp_data"):
+            telegram_bot.temp_data = {}
+        telegram_bot.temp_data[event.sender_id] = {
             "url": url,
             "step": "quality",
             "type": "youtube",
@@ -876,9 +871,9 @@ async def handle_url(event: events.NewMessage):
             "🔞 لینک **بزرگسال** شناسایی شد!\n\nکیفیت مورد نظر را انتخاب کنید:",
             buttons=buttons,
         )
-        if not hasattr(bot, "temp_data"):
-            bot.temp_data = {}
-        bot.temp_data[event.sender_id] = {
+        if not hasattr(telegram_bot, "temp_data"):
+            telegram_bot.temp_data = {}
+        telegram_bot.temp_data[event.sender_id] = {
             "url": url,
             "step": "quality",
             "type": "adult",
@@ -929,7 +924,7 @@ async def handle_url(event: events.NewMessage):
 
 
 # ==================== Callback Handler ====================
-@bot.on(events.CallbackQuery)
+@telegram_bot.on(events.CallbackQuery)
 async def callback_handler(event: events.CallbackQuery):
     user_id = event.sender_id
     data = event.data.decode()
@@ -944,18 +939,18 @@ async def callback_handler(event: events.CallbackQuery):
     ):
         return
 
-    if not hasattr(bot, "temp_data") or user_id not in bot.temp_data:
+    if not hasattr(telegram_bot, "temp_data") or user_id not in telegram_bot.temp_data:
         await event.answer("❌ لطفاً دوباره لینک را بفرستید.", alert=True)
         return
 
-    td = bot.temp_data[user_id]
+    td = telegram_bot.temp_data[user_id]
     url = td["url"]
     status_msg = td.get("status_msg", event)
     original_msg = td.get("original_msg", event)
 
     if data.endswith("_cancel"):
         await event.edit("❌ عملیات لغو شد.")
-        del bot.temp_data[user_id]
+        del telegram_bot.temp_data[user_id]
         return
 
     if data.startswith("adult_"):
@@ -967,7 +962,7 @@ async def callback_handler(event: events.CallbackQuery):
         }
         quality = qmap.get(data)
         if quality:
-            del bot.temp_data[user_id]
+            del telegram_bot.temp_data[user_id]
             await event.edit(f"⏳ اضافه شد به صف — کیفیت {quality}p\n\nبرای لغو: /cancel")
             cancel_ev = asyncio.Event()
             _cancel_flags[user_id] = cancel_ev
@@ -988,7 +983,7 @@ async def callback_handler(event: events.CallbackQuery):
     elif data in ["yt_480", "yt_720", "yt_1080"]:
         qmap = {"yt_480": "480", "yt_720": "720", "yt_1080": "1080"}
         quality = qmap[data]
-        del bot.temp_data[user_id]
+        del telegram_bot.temp_data[user_id]
         await event.edit(f"⏳ اضافه شد به صف — {quality}p\n\nبرای لغو: /cancel")
         cancel_ev = asyncio.Event()
         _cancel_flags[user_id] = cancel_ev
@@ -1007,7 +1002,7 @@ async def callback_handler(event: events.CallbackQuery):
             await event.edit(f"⏳ در صف انتظار — موقعیت: {pos}\n\nبرای لغو: /cancel")
 
     elif data == "yt_audio_first":
-        bot.temp_data[user_id]["step"] = "bitrate"
+        telegram_bot.temp_data[user_id]["step"] = "bitrate"
         buttons = [
             [Button.inline("🔊 64 kbps", b"audio_64")],
             [Button.inline("🎵 128 kbps", b"audio_128")],
@@ -1023,7 +1018,7 @@ async def callback_handler(event: events.CallbackQuery):
             "audio_320": "320",
         }
         bitrate = bitrate_map[data]
-        del bot.temp_data[user_id]
+        del telegram_bot.temp_data[user_id]
         await event.edit(f"⏳ اضافه شد به صف — صدا {bitrate}kbps\n\nبرای لغو: /cancel")
         cancel_ev = asyncio.Event()
         _cancel_flags[user_id] = cancel_ev
@@ -1043,7 +1038,7 @@ async def callback_handler(event: events.CallbackQuery):
             await event.edit(f"⏳ در صف انتظار — موقعیت: {pos}\n\nبرای لغو: /cancel")
 
     elif data == "back_to_quality":
-        bot.temp_data[user_id]["step"] = "quality"
+        telegram_bot.temp_data[user_id]["step"] = "quality"
         buttons = [
             [
                 Button.inline("🎬 480p", b"yt_480"),
@@ -1059,11 +1054,56 @@ async def callback_handler(event: events.CallbackQuery):
 
 
 # ==================== main ====================
-async def main():
+async def main() -> None:
     print("Telegram bot is starting...")
-    asyncio.create_task(queue_worker())
-    await bot.start(bot_token=BOT_TOKEN)
-    await bot.run_until_disconnected()
+    print("Checking credentials...")
+    _does_telegram_client_needs_reload: bool = False
+    # If API ID is not set, get it from the user
+    if load_api_id() == 1:
+        # Get API ID
+        print("API ID not found. Please enter it:")
+        _api_id: int = int(input().strip())  # noqa: ASYNC250
+        # Save API ID
+        save_api_id(_api_id)
+        # Set to reload the telegram client with new credentials
+        _does_telegram_client_needs_reload = True
+
+    # If API HASH is not set, get it from the user
+    if load_api_hash() == "NOT_SET":
+        # Get API HASH
+        print("API HASH not found. Please enter it:")
+        _api_hash: str = input().strip()  # noqa: ASYNC250
+        # Save API HASH
+        save_api_hash(_api_hash)
+        # Set to reload the telegram client with the new credentials
+        _does_telegram_client_needs_reload = True
+
+    # If Bot Token is not set, get it from the user
+    if not load_bot_token():
+        # Get Bot Token
+        print("Bot Token not found. Please enter it:")
+        _bot_token: str = input().strip()  # noqa: ASYNC250
+        # Save Bot Token
+        save_bot_token(_bot_token)
+
+    # Reload telegram client if required and start with new data
+    if _does_telegram_client_needs_reload:
+        updated_telegram_bot: TelegramClient = TelegramClient(
+            SESSION_NAME,
+            load_api_id(),
+            load_api_hash(),
+        )
+
+        async with updated_telegram_bot:
+            await updated_telegram_bot.start(bot_token=load_bot_token())
+            print("Telegram client reloaded with new credentials.")
+            await updated_telegram_bot.run_until_disconnected()
+    else:
+        # Else, use the existing client
+        async with telegram_bot:  # pylint: disable=E0606
+            await telegram_bot.start(bot_token=load_bot_token())
+            print("Bot started successfully!")
+            await telegram_bot.run_until_disconnected()
 
 
 if __name__ == "__main__":

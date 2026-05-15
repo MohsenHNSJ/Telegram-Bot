@@ -7,7 +7,7 @@ requires = ["poetry-core>=2.4.0"]
 
 [project]
 name = "vamo_telbot" # PyPI package name
-version = "0.1.0" # Base version
+version = "0.2.0" # Base version
 description = "Utility Telegram Bot for emergency situations"
 license = "MIT"
 readme = "README.rst"
