@@ -1,9 +1,9 @@
-"""Tests for utility functions."""
+"""Tests for URL checker utilities."""
 
 # ruff: noqa: S101, FBT001
 import pytest
 
-from vamo_telbot.utils import is_adult_url, is_social_url, is_youtube_url, make_bar
+from vamo_telbot.utils.url_checkers import is_adult_url, is_social_url, is_youtube_url
 
 
 @pytest.mark.benchmark
@@ -57,26 +57,3 @@ def test_is_adult_url(url: str, expected: bool) -> None:
 def test_is_social_url(url: str, expected: bool) -> None:
     """Test the is_social_url function."""
     assert is_social_url(url) == expected
-
-
-@pytest.mark.benchmark
-@pytest.mark.parametrize(
-    ("percent", "width", "fill", "empty", "expected"),
-    [
-        (0, 12, "█", "░", "░" * 12),  # 0% progress
-        (50, 12, "█", "░", "█" * 6 + "░" * 6),  # 50% progress
-        (100, 12, "█", "░", "█" * 12),  # 100% progress
-        # 25% progress with smaller width
-        (25, 8, "█", "░", "█" * 2 + "░" * 6),
-        (110, 10, "█", "░", "█" * 10),  # >100% should be clamped
-        (-20, 10, "█", "░", "░" * 10),  # <0% should be clamped
-        # custom fill/empty characters
-        (50, 10, "#", "-", "#" * 5 + "-" * 5),
-        # fractional width rounding down
-        (33, 9, "■", ".", "■" * 2 + "." * 7),
-        (66, 9, "■", ".", "■" * 5 + "." * 4),  # another fractional case
-    ],
-)
-def test_make_bar(percent: float, width: int, fill: str, empty: str, expected: str) -> None:
-    """Test make_bar with various percentages, widths, and characters."""
-    assert make_bar(percent, width, fill, empty) == expected

@@ -9,17 +9,22 @@ from typing import Final
 
 from vamo_telbot.config.manager import get_config_value, set_config_value
 
+# Keys
 _API_ID_KEY: Final[str] = "api_id"
 _API_HASH_KEY: Final[str] = "api_hash"
 _BOT_TOKEN_KEY: Final[str] = "bot_token"  # noqa: S105
-
+# Not defined constants
+HASH_OR_TOKEN_NOT_SET: Final[str] = "NOT_SET"  # noqa: S105
+ID_NOT_SET: Final[int] = 1
 
 # region API ID
+
+
 def load_api_id() -> int:
     """Load the telegram API ID from the configuration file.
 
     Returns:
-        The stored API ID if present, otherwise ``1``.
+        The stored API ID if present, otherwise ``ID_NOT_SET``.
     """
     # Get the API ID
     api_id: int | None = get_config_value(_API_ID_KEY)
@@ -29,7 +34,7 @@ def load_api_id() -> int:
         return api_id
 
     # Else return 1
-    return 1
+    return ID_NOT_SET
 
 
 def save_api_id(api_id: int) -> None:
@@ -50,7 +55,7 @@ def load_api_hash() -> str:
     """Load the telegram API HASH from the configuration file.
 
     Returns:
-        The stored API HASH if present, otherwise ``NOT_SET``.
+        The stored API HASH if present, otherwise ``HASH_OR_TOKEN_NOT_SET``.
     """
     # Get the API HASH
     api_hash: str | None = get_config_value(_API_HASH_KEY)
@@ -59,8 +64,8 @@ def load_api_hash() -> str:
     if isinstance(api_hash, str):
         return api_hash
 
-    # Else return "NOT_SET"
-    return "NOT_SET"
+    # Else return "HASH_OR_TOKEN_NOT_SET"
+    return HASH_OR_TOKEN_NOT_SET
 
 
 def save_api_hash(api_hash: str) -> None:
@@ -77,11 +82,11 @@ def save_api_hash(api_hash: str) -> None:
 # region BOT TOKEN
 
 
-def load_bot_token() -> str | None:
+def load_bot_token() -> str:
     """Load the telegram Bot Token from the configuration file.
 
     Returns:
-        The stored Bot Token if present, otherwise ``None``.
+        The stored Bot Token if present, otherwise ``HASH_OR_TOKEN_NOT_SET``.
     """
     # Get the Bot Token
     bot_token = get_config_value(_BOT_TOKEN_KEY)
@@ -90,8 +95,8 @@ def load_bot_token() -> str | None:
     if isinstance(bot_token, str):
         return bot_token
 
-    # Else return None
-    return None
+    # Else return ``HASH_OR_TOKEN_NOT_SET``
+    return HASH_OR_TOKEN_NOT_SET
 
 
 def save_bot_token(bot_token: str) -> None:

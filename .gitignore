@@ -272,3 +272,4 @@ secrets.json
 telegram_bot_session.session
 telegram_bot_session.session-journal
 telegram_bot.session
+telegram_bot.session-journal

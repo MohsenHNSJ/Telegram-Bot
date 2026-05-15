@@ -10,6 +10,8 @@ from vamo_telbot.config.telegram import (
     _API_HASH_KEY,
     _API_ID_KEY,
     _BOT_TOKEN_KEY,
+    HASH_OR_TOKEN_NOT_SET,
+    ID_NOT_SET,
     load_api_hash,
     load_api_id,
     load_bot_token,
@@ -23,9 +25,9 @@ from vamo_telbot.config.telegram import (
     ("mock_return", "expected"),
     [
         (12345, 12345),  # valid integer from config
-        ("12345", 1),  # string instead of int → fallback
-        (None, 1),  # missing key → fallback
-        ([], 1),  # invalid type → fallback
+        ("12345", ID_NOT_SET),  # string instead of int → fallback
+        (None, ID_NOT_SET),  # missing key → fallback
+        ([], ID_NOT_SET),  # invalid type → fallback
     ],
 )
 def test_load_api_id(mock_return: Any, expected: int) -> None:
@@ -60,9 +62,9 @@ def test_save_api_id(api_id: int) -> None:
     ("mock_return", "expected"),
     [
         ("ABC123XYZ", "ABC123XYZ"),  # valid string returned
-        (12345, "NOT_SET"),  # invalid type → fallback
-        (None, "NOT_SET"),  # missing key → fallback
-        ([], "NOT_SET"),  # invalid type → fallback
+        (12345, HASH_OR_TOKEN_NOT_SET),  # invalid type → fallback
+        (None, HASH_OR_TOKEN_NOT_SET),  # missing key → fallback
+        ([], HASH_OR_TOKEN_NOT_SET),  # invalid type → fallback
     ],
 )
 def test_load_api_hash(mock_return: Any, expected: str) -> None:
@@ -97,9 +99,9 @@ def test_save_api_hash(api_hash: str) -> None:
     ("mock_return", "expected"),
     [
         ("123456:ABCDEF", "123456:ABCDEF"),  # valid token string
-        (123456, None),  # invalid type → fallback
-        (None, None),  # missing key → fallback
-        ([], None),  # invalid type → fallback
+        (123456, HASH_OR_TOKEN_NOT_SET),  # invalid type → fallback
+        (None, HASH_OR_TOKEN_NOT_SET),  # missing key → fallback
+        ([], HASH_OR_TOKEN_NOT_SET),  # invalid type → fallback
     ],
 )
 def test_load_bot_token(mock_return: Any, expected: str) -> None:

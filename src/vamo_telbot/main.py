@@ -24,17 +24,16 @@ import aiohttp
 from telethon import TelegramClient, events
 from telethon.tl.custom import Button, Message
 
+from vamo_telbot.bot.runner import start_bot
 from vamo_telbot.commands.start import handle_start
 from vamo_telbot.config.telegram import (
     load_api_hash,
     load_api_id,
-    load_bot_token,
-    save_api_hash,
-    save_api_id,
-    save_bot_token,
 )
 from vamo_telbot.global_constants import AUTHORIZED_USER_ID, SECOND_USER_ID
-from vamo_telbot.utils import is_adult_url, is_social_url, is_youtube_url, make_bar
+from vamo_telbot.utils.credentials import ensure_credentials
+from vamo_telbot.utils.url_checkers import is_adult_url, is_social_url, is_youtube_url
+from vamo_telbot.utils.visuals import make_bar
 
 # endregion Imports
 
@@ -54,8 +53,8 @@ USER_FOLDERS = {
 
 telegram_bot: TelegramClient = TelegramClient(
     SESSION_NAME,
-    1,
-    "NOT_SET",
+    load_api_id(),
+    load_api_hash(),
 )
 
 # ==================== Queue & Cancel ====================
@@ -815,11 +814,6 @@ async def back_to_filelist(event: events.CallbackQuery):
     await file_manager(event)
 
 
-@telegram_bot.on(events.NewMessage(pattern="/start"))
-async def start(event: events.newmessage.NewMessage.Event) -> None:
-    await handle_start(event)
-
-
 # ==================== هندلر اصلی لینک ====================
 @telegram_bot.on(events.NewMessage(pattern=r"^https?://"))
 async def handle_url(event: events.NewMessage):
@@ -1053,57 +1047,27 @@ async def callback_handler(event: events.CallbackQuery):
         await event.edit("🎬 کیفیت را انتخاب کنید:", buttons=buttons)
 
 
+# Main menu actions
+
+
+@telegram_bot.on(events.NewMessage(pattern="/start"))
+async def start(event: events.newmessage.NewMessage.Event) -> None:
+    await handle_start(event)
+
+
 # ==================== main ====================
 async def main() -> None:
     print("Telegram bot is starting...")
     print("Checking credentials...")
-    _does_telegram_client_needs_reload: bool = False
-    # If API ID is not set, get it from the user
-    if load_api_id() == 1:
-        # Get API ID
-        print("API ID not found. Please enter it:")
-        _api_id: int = int(input().strip())  # noqa: ASYNC250
-        # Save API ID
-        save_api_id(_api_id)
-        # Set to reload the telegram client with new credentials
-        _does_telegram_client_needs_reload = True
 
-    # If API HASH is not set, get it from the user
-    if load_api_hash() == "NOT_SET":
-        # Get API HASH
-        print("API HASH not found. Please enter it:")
-        _api_hash: str = input().strip()  # noqa: ASYNC250
-        # Save API HASH
-        save_api_hash(_api_hash)
-        # Set to reload the telegram client with the new credentials
-        _does_telegram_client_needs_reload = True
+    needs_restart: bool = await ensure_credentials()
 
-    # If Bot Token is not set, get it from the user
-    if not load_bot_token():
-        # Get Bot Token
-        print("Bot Token not found. Please enter it:")
-        _bot_token: str = input().strip()  # noqa: ASYNC250
-        # Save Bot Token
-        save_bot_token(_bot_token)
+    if needs_restart:
+        print("Credentials were updated. Restart the program to apply changes.")
+        return
 
-    # Reload telegram client if required and start with new data
-    if _does_telegram_client_needs_reload:
-        updated_telegram_bot: TelegramClient = TelegramClient(
-            SESSION_NAME,
-            load_api_id(),
-            load_api_hash(),
-        )
-
-        async with updated_telegram_bot:
-            await updated_telegram_bot.start(bot_token=load_bot_token())
-            print("Telegram client reloaded with new credentials.")
-            await updated_telegram_bot.run_until_disconnected()
-    else:
-        # Else, use the existing client
-        async with telegram_bot:  # pylint: disable=E0606
-            await telegram_bot.start(bot_token=load_bot_token())
-            print("Bot started successfully!")
-            await telegram_bot.run_until_disconnected()
+    print("Credentials OK. Starting bot...")
+    await start_bot(telegram_bot)
 
 
 if __name__ == "__main__":
