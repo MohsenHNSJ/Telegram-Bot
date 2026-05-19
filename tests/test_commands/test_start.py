@@ -7,6 +7,7 @@ import pytest
 from vamo_telbot.commands.start import _START_COMMAND_REPLY, handle_start
 
 
+@pytest.mark.benchmark
 @pytest.mark.asyncio
 async def test_handle_start_calls_reply() -> None:
     """Test that handle_start calls the reply method with the correct message."""

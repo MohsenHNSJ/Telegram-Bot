@@ -10,6 +10,7 @@ from vamo_telbot.config.telegram import HASH_OR_TOKEN_NOT_SET, ID_NOT_SET
 from vamo_telbot.utils.credentials import ensure_credentials
 
 
+@pytest.mark.benchmark
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
     (

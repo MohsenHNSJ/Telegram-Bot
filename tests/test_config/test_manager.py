@@ -10,6 +10,7 @@ import pytest
 from vamo_telbot.config.manager import get_config_value, load_config, save_config, set_config_value
 
 
+@pytest.mark.benchmark
 @pytest.mark.parametrize(
     ("exists", "read_text_return", "read_text_side_effect", "expected"),
     [
@@ -47,6 +48,7 @@ def test_load_config(
         assert result == expected
 
 
+@pytest.mark.benchmark
 @pytest.mark.parametrize(
     "config_data",
     [
@@ -77,6 +79,7 @@ def test_save_config(config_data: dict[str, str] | dict[str, int | list[int]]) -
         assert encoding == "utf-8"
 
 
+@pytest.mark.benchmark
 @pytest.mark.parametrize(
     ("existing_config", "key", "value", "expected_config"),
     [
@@ -124,6 +127,7 @@ def test_set_config_value(
         mock_save.assert_called_once_with(expected_config)
 
 
+@pytest.mark.benchmark
 @pytest.mark.parametrize(
     ("mock_config", "key", "default", "expected"),
     [

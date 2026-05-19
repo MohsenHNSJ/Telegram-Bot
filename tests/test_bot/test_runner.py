@@ -11,6 +11,7 @@ from vamo_telbot.bot.runner import start_bot
 _FAKE_BOT_TOKEN: Final[str] = "fake_bot_token"  # noqa: S105
 
 
+@pytest.mark.benchmark
 @pytest.mark.asyncio
 async def test_start_bot_runs_methods() -> None:
     """Tests that start_bot.

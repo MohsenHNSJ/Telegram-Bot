@@ -25,7 +25,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Typing :: Typed",
 ]
-dependencies = ["telethon == 1.43.2", "cryptg == 0.6.0", "pillow == 12.2.0", "hachoir == 3.3.0"]
+dependencies = ["telethon == 1.43.2", "cryptg == 0.6.0", "pillow == 12.2.0", "hachoir == 3.3.0", "yt-dlp == 2026.5.16.233954.dev0", "yt-dlp-ejs == 0.8.0", "curl-cffi == 0.15.0"]
 
 [project.urls]
 Bug = "https://github.com/MohsenHNSJ/Telegram-Bot/issues"
@@ -250,6 +250,8 @@ exclude-deps =[
   "cryptg",
   "pillow",
   "hachoir",
+  "curl-cffi",
+  "yt-dlp-ejs",
 ]
 
 # Configure the output of pre-commit-update resulting YAML
