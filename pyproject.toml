@@ -63,6 +63,7 @@ safety = "3.7.0"
 # Other requirements constraints to keep dependencies up-to-date
 # These are not directly required by the project
 # But only required by the above packages
+h11 = "0.16.0"
 urllib3 = "2.7.0"
 
 # Requirements for documentation
