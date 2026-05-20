@@ -16,7 +16,7 @@ async def download_youtube_video(url: str) -> str:
     }
 
     def _download() -> str:
-        with YoutubeDL(ydl_opts) as ydl:  # type: ignore[reportArgumentType]
+        with YoutubeDL(ydl_opts) as ydl:  # pyright: ignore[reportArgumentType]
             info = ydl.extract_info(url)
             return str(ydl.prepare_filename(info))
 

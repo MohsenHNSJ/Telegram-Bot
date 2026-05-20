@@ -60,6 +60,7 @@ nitpick_ignore: set[tuple[str, str]] = {
     (PY_CLASS, "telethon.events.NewMessage"),
     (PY_CLASS, "telethon.TelegramClient"),
     (PY_CLASS, "TelegramClient"),
+    (PY_CLASS, "events.newmessage.NewMessage.Event"),
     (PY_CLASS, "Decimal"),  # Built-in type
     (PY_CLASS, "ClientResponse"),  # aiohttp
     (PY_CLASS, "optional"),  # Documentation

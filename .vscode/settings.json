@@ -209,6 +209,7 @@
     "htmlcov",
     "htmlzip",
     "icccm",
+    "idna",
     "imgconverter",
     "intersphinx",
     "ipynb",

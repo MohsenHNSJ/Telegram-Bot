@@ -14,7 +14,7 @@ async def handle_youtube_download(event: events.newmessage.NewMessage.Event) -> 
 
     Args:
         event (events.newmessage.NewMessage.Event): The event triggered by a new message,
-        containing a YouTube link.
+            containing a YouTube link.
     """
     url: str = event.message.message
     await event.reply("⏳ Downloading your YouTube video...")
