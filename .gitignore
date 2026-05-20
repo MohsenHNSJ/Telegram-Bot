@@ -266,3 +266,10 @@ styles/write-good
 server_config.json
 app_config.json
 cache
+bot_session.session
+bot_session.session-journal
+secrets.json
+telegram_bot_session.session
+telegram_bot_session.session-journal
+telegram_bot.session
+telegram_bot.session-journal
