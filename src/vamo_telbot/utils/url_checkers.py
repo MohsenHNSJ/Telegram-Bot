@@ -1,13 +1,12 @@
-"""Utility functions for the Telegram bot."""
+"""URL Checkers module."""
 
 import re
 
 # region URL Patterns
-YOUTUBE_PATTERNS: list[re.Pattern[str]] = [
-    re.compile(r"(youtu\.be/)", re.IGNORECASE),
-    re.compile(r"(youtube\.com/watch\?v=)", re.IGNORECASE),
-    re.compile(r"(youtube\.com/shorts/)", re.IGNORECASE),
-]
+YOUTUBE_PATTERNS: re.Pattern[str] = re.compile(
+    r"(youtu\.be/|youtube\.com/watch\?v=|youtube\.com/shorts/)",
+    re.IGNORECASE,
+)
 ADULT_PATTERNS: list[re.Pattern[str]] = [
     re.compile(r"pornhub\.com", re.IGNORECASE),
     re.compile(r"xvideos\.com", re.IGNORECASE),
@@ -39,7 +38,7 @@ def is_youtube_url(url: str) -> bool:
     Returns:
         bool: True if the URL is a YouTube link, False otherwise.
     """
-    return any(pattern.search(url) for pattern in YOUTUBE_PATTERNS)
+    return bool(YOUTUBE_PATTERNS.search(url))
 
 
 def is_adult_url(url: str) -> bool:
@@ -67,20 +66,3 @@ def is_social_url(url: str) -> bool:
 
 
 # endregion URL Checkers
-
-
-def make_bar(percent: float, width: int = 12, fill: str = "█", empty: str = "░") -> str:
-    """Generate a simple text progress bar.
-
-    Args:
-        percent (float): Progress percentage (0-100).
-        width (int): Total width of the bar.
-        fill (str): Character to represent filled progress.
-        empty (str): Character to represent empty progress.
-
-    Returns:
-        str: Text-based progress bar.
-    """
-    percent = max(0, min(100, percent))  # clamp to [0, 100]
-    filled = int(width * percent / 100)
-    return fill * filled + empty * (width - filled)

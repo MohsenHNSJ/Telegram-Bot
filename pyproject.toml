@@ -7,7 +7,7 @@ requires = ["poetry-core>=2.4.0"]
 
 [project]
 name = "vamo_telbot" # PyPI package name
-version = "0.1.0" # Base version
+version = "0.2.0" # Base version
 description = "Utility Telegram Bot for emergency situations"
 license = "MIT"
 readme = "README.rst"
@@ -25,7 +25,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Typing :: Typed",
 ]
-dependencies = ["aiohttp == 3.13.5", "aiofiles == 25.1.0", "telethon==1.43.2"]
+dependencies = ["telethon == 1.43.2", "cryptg == 0.6.0", "pillow == 12.2.0", "hachoir == 3.3.0", "yt-dlp == 2026.5.16.233954.dev0", "yt-dlp-ejs == 0.8.0", "curl-cffi == 0.15.0"]
 
 [project.urls]
 Bug = "https://github.com/MohsenHNSJ/Telegram-Bot/issues"
@@ -63,6 +63,9 @@ safety = "3.7.0"
 # Other requirements constraints to keep dependencies up-to-date
 # These are not directly required by the project
 # But only required by the above packages
+h11 = "0.16.0"
+idna = "3.15"
+urllib3 = "2.7.0"
 
 # Requirements for documentation
 [tool.poetry.group.docs.dependencies]
@@ -245,7 +248,11 @@ sections = ["project.dependencies"]
 venvs = [".venv"]
 # Dependencies you wish to not scan for.
 exclude-deps =[
-  "python-bidi",
+  "cryptg",
+  "pillow",
+  "hachoir",
+  "curl-cffi",
+  "yt-dlp-ejs",
 ]
 
 # Configure the output of pre-commit-update resulting YAML
