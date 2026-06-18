@@ -67,7 +67,7 @@ jobs:
           pytest-codspeed: true
 
       - name: Run benchmark
-        uses: CodSpeedHQ/action@3194d9a39c4d46684cb44bf7207fc56626aad8fd # v4.15.1
+        uses: CodSpeedHQ/action@63f3e98b61959fe67f146a3ff022e4136fe9bb9c # v4.17.6
         with:
           mode: "simulation" # Deterministic CPU simulation for stable CI benchmarks
           run: pytest tests/ --codspeed -rA
