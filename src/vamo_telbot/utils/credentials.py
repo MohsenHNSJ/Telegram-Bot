@@ -1,5 +1,7 @@
 """Credential management utilities for the Telegram bot."""
 
+import asyncio
+
 from vamo_telbot.config.telegram import (
     HASH_OR_TOKEN_NOT_SET,
     ID_NOT_SET,
@@ -21,17 +23,18 @@ async def ensure_credentials() -> bool:
     needs_reload = False
 
     if load_api_id() == ID_NOT_SET:
-        api_id = int(input("API ID not found. Please enter it: ").strip())  # noqa: ASYNC250
+        response = await asyncio.to_thread(input, "API ID not found. Please enter it: ")
+        api_id = int(response.strip())
         save_api_id(api_id)
         needs_reload = True
 
     if load_api_hash() == HASH_OR_TOKEN_NOT_SET:
-        api_hash = input("API HASH not found. Please enter it: ").strip()  # noqa: ASYNC250
+        api_hash = (await asyncio.to_thread(input, "API HASH not found. Please enter it: ")).strip()
         save_api_hash(api_hash)
         needs_reload = True
 
     if load_bot_token() == HASH_OR_TOKEN_NOT_SET:
-        bot_token = input("Bot Token not found. Please enter it: ").strip()  # noqa: ASYNC250
+        bot_token = (await asyncio.to_thread(input, "Bot Token not found. Please enter it: ")).strip()
         save_bot_token(bot_token)
 
     return needs_reload
