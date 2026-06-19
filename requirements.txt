@@ -1,6 +1,9 @@
 aiofiles==25.1.0
 aiohttp==3.13.5
 cryptg==0.6.0
+curl-cffi==0.15.0
 hachoir==3.3.0
 pillow==12.2.0
 telethon==1.43.2
+yt-dlp==2026.5.16.233954.dev0
+yt-dlp-ejs==0.8.0

@@ -21,35 +21,18 @@ from vamo_telbot.utils.url_checkers import YOUTUBE_PATTERNS as YT_P
 # ==================== تنظیمات ====================
 SESSION_NAME: str = "telegram_bot"
 
-telegram_bot: TelegramClient = TelegramClient(
-    SESSION_NAME,
-    load_api_id(),
-    load_api_hash(),
-)
 
+def create_bot_client() -> TelegramClient:
+    """Create the Telegram client instance.
 
-# Main menu actions
-
-
-@telegram_bot.on(events.NewMessage(pattern=YT_P))  # type: ignore[misc]
-async def youtube_download(event: events.newmessage.NewMessage.Event) -> None:
-    """Handle incoming YouTube links and trigger the download process.
-
-    Args:
-        event (events.newmessage.NewMessage.Event): The event triggered by a new message,
-            containing a YouTube link.
+    Returns:
+        TelegramClient: A new Telegram client instance.
     """
-    await handle_youtube_download(event)
-
-
-@telegram_bot.on(events.NewMessage(pattern="/start"))  # type: ignore[misc]
-async def start(event: events.newmessage.NewMessage.Event) -> None:
-    """Handle the /start command from users.
-
-    Args:
-        event (events.newmessage.NewMessage.Event): The event triggered by the /start command.
-    """
-    await handle_start(event)
+    return TelegramClient(
+        SESSION_NAME,
+        load_api_id(),
+        load_api_hash(),
+    )
 
 
 async def main() -> None:
@@ -64,6 +47,16 @@ async def main() -> None:
         return
 
     print("Credentials OK. Starting bot...")
+    telegram_bot = create_bot_client()
+
+    @telegram_bot.on(events.NewMessage(pattern=YT_P))  # type: ignore[misc]
+    async def youtube_download(event: events.newmessage.NewMessage.Event) -> None:
+        await handle_youtube_download(event)
+
+    @telegram_bot.on(events.NewMessage(pattern="/start"))  # type: ignore[misc]
+    async def start(event: events.newmessage.NewMessage.Event) -> None:
+        await handle_start(event)
+
     await start_bot(telegram_bot)
 
 
