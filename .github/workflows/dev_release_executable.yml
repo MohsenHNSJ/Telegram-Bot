@@ -107,7 +107,7 @@ jobs:
 
       - name: Publish or edit the draft notes
         id: create_draft_release
-        uses: release-drafter/release-drafter@c2e2804cc59f45f57076a99af580d0fedb697927 # v7.3.0
+        uses: release-drafter/release-drafter@73b95fa1c286dfd6802a4f949b07dad6149f2b0f # v7.5.0
         with:
           publish: false
           tag: ${{ steps.check-version.outputs.tag }}
